@@ -26,6 +26,7 @@ import Button from "@material-ui/core/Button";
 import CheckoutForm from "./stripe/CheckoutForm";
 
 import UserActions from "../../actions/UserActions";
+import AppActions from "../../actions/AppActions";
 
 import { BalancedAmount, ColoredAmount, Amount } from "../currency/Amount";
 
@@ -111,7 +112,11 @@ export default function SubscriptionSettings() {
         setIsWithPromocode(true);
       })
       .catch((exception) => {
-        console.log(exception);
+        if (exception.response.status === 404) {
+          dispatch(AppActions.snackbar(`Coupon '${promocode}' does not exist`));
+        } else {
+          console.error(exception);
+        }
       });
   };
 

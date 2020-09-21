@@ -76,7 +76,7 @@ export const Main = () => {
     (error) => {
       if (error && error.response && error.response.status === 503) {
         dispatch(ServerActions.maintenance());
-      } else {
+      } else if (error.response.status !== 404) {
         dispatch(ServerActions.error(error.response));
       }
       return Promise.reject(error);
