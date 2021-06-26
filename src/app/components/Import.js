@@ -2,12 +2,16 @@
  * In this file, we create a React component
  * which incorporates components provided by Material-UI.
  */
+
+import "./Import.scss";
+
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "../router";
 
 import Card from "@material-ui/core/Card";
 import Fab from "@material-ui/core/Fab";
+import Button from "@material-ui/core/Button";
 import ImportExportIcon from "@material-ui/icons/ImportExport";
 
 // import TextField from "@material-ui/core/TextField";
@@ -97,6 +101,7 @@ export default function Import(props) {
   const onFileChange = (event) => {
     // Update the state
     // this.setState({ selectedFile: event.target.files[0] });
+    console.log(event.target.files[0]);
     setSelectedFile(event.target.files[0]);
   };
 
@@ -113,7 +118,7 @@ export default function Import(props) {
 
     // Request made to the backend api
     // Send formData object
-    axios.post("api/uploadfile", formData);
+    // axios.post("api/uploadfile", formData);
   };
 
   // File content to be displayed after
@@ -152,20 +157,26 @@ export default function Import(props) {
             <UserButton type="button" color="white" />
           </div>
         </div>
+      </header>
+      <div className="import_two_columns">
         <form
-          className="layout_header_date_range wrapperMobile"
+          className="import_aside wrapperMobile"
           onSubmit={(event) => event.preventDefault()}
         >
-          <input type="file" onChange={this.onFileChange} />
+          <Button variant="contained" component="label">
+            Select File
+            <input type="file" onChange={onFileChange} hidden />
+          </Button>
           <Fab
             variant="extended"
             onClick={(event) => onFileUpload(event.target.value)}
           >
+            UPLOAD
             <ImportExportIcon />
-            Import
           </Fab>
         </form>
-      </header>
+        <div className="layout_content wrapperMobile">{fileData()}</div>
+      </div>
       <div className="layout_report layout_content wrapperMobile">
         {statistics || isLoading ? (
           <div style={{ maxWidth: 750 }}>
