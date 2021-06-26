@@ -36,6 +36,7 @@ import Reset from "./components/Reset";
 import Welcoming from "./components/Welcoming";
 import ResetPassword from "./components/ResetPassword";
 import Search from "./components/Search";
+import Import from "./components/Import";
 import Convertor from "./components/Convertor";
 import Nomadlist from "./components/Nomadlist";
 
@@ -405,6 +406,7 @@ export const Main = () => {
                     <Route exact path="/changes" component={Changes} />
                     <Route path="/changes/:id" component={Changes} />
                     <Route path="/search" component={Search} />
+                    <Route path="/import" component={Import} />
                     <Route path="/convertor" component={Convertor} />
                     <Route path="/nomadlist" component={Nomadlist} />
                     <Route path="/settings" component={Settings} />

@@ -17,6 +17,7 @@ import LanguageIcon from "@material-ui/icons/Language";
 import MoreHoriz from "@material-ui/icons/MoreHoriz";
 import Tooltip from "@material-ui/core/Tooltip";
 import SearchIcon from "@material-ui/icons/Search";
+import ImportExportIcon from "@material-ui/icons/ImportExport";
 import MapIcon from "@material-ui/icons/Map";
 
 import List from "@material-ui/core/List";
@@ -97,6 +98,8 @@ export default function Navigation(props) {
         setValueDesktop("convertor");
       } else if (location.pathname.startsWith("/nomadlist")) {
         setValueDesktop("nomadlist");
+      } else if (location.pathname.startsWith("/import")) {
+        setValueDesktop("import");
       } else {
         setValueDesktop("more");
       }
@@ -218,6 +221,16 @@ export default function Navigation(props) {
             <Tooltip title="Search" enterDelay={450} placement="right">
               <IconButton style={styles.iconButton}>
                 <SearchIcon style={{ color: "white" }} />
+              </IconButton>
+            </Tooltip>
+          </Link>
+          <Link
+            to={"/import"}
+            style={valueDesktop == "import" ? styles.selected : {}}
+          >
+            <Tooltip title="Import" enterDelay={450} placement="right">
+              <IconButton style={styles.iconButton}>
+                <ImportExportIcon style={{ color: "white" }} />
               </IconButton>
             </Tooltip>
           </Link>

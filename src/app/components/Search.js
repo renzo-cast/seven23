@@ -15,7 +15,7 @@ import TransactionTable from "./transactions/TransactionTable";
 import UserButton from "./settings/UserButton";
 import TransactionForm from "./transactions/TransactionForm";
 
-let timer = null; // Store timeout to avoid search between each caracters
+let timer = null; // Store timeout to avoid search between each characters
 const DELAY_TYPE_TO_SEARCH = 500;
 
 export default function Search(props) {
