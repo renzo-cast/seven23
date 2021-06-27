@@ -12,6 +12,8 @@ import { useRouter } from "../router";
 import Card from "@material-ui/core/Card";
 import Fab from "@material-ui/core/Fab";
 import Button from "@material-ui/core/Button";
+import AppBar from "@material-ui/core/AppBar";
+import Alert from "@material-ui/lab/Alert";
 import ImportExportIcon from "@material-ui/icons/ImportExport";
 
 // import TextField from "@material-ui/core/TextField";
@@ -33,6 +35,8 @@ export default function Import(props) {
   const [isLoading, setIsLoading] = useState(false);
 
   const [categories] = useSelector((state) => state.categories.list);
+
+  const acceptedFileTypes = ["text/csv"];
 
   // Trigger on typing
   // const setSearch = (text) => {
@@ -99,10 +103,23 @@ export default function Import(props) {
 
   // On file select (from the pop up)
   const onFileChange = (event) => {
+    const file = event.target.files[0];
+
+    // check if file one of accepted types
+    if (!acceptedFileTypes.includes(file.type)) {
+      setError({
+        type: "FileError",
+        details:
+          "File type '" +
+          file.type +
+          "' no one of " +
+          acceptedFileTypes.toString(),
+      });
+      return;
+    }
     // Update the state
     // this.setState({ selectedFile: event.target.files[0] });
-    console.log(event.target.files[0]);
-    setSelectedFile(event.target.files[0]);
+    setSelectedFile(file);
   };
 
   // On file upload (click the upload button)
@@ -124,6 +141,15 @@ export default function Import(props) {
   // File content to be displayed after
   // file upload is complete
   const fileData = () => {
+    // show error
+    if (Object.keys(error).length !== 0) {
+      return (
+        <div>
+          <Alert severity="error">File error: {error.details}</Alert>
+        </div>
+      );
+    }
+    // show file details
     if (selectedFile) {
       return (
         <div>
@@ -159,23 +185,28 @@ export default function Import(props) {
         </div>
       </header>
       <div className="import_two_columns">
-        <form
-          className="import_aside wrapperMobile"
-          onSubmit={(event) => event.preventDefault()}
-        >
-          <Button variant="contained" component="label">
-            Select File
-            <input type="file" onChange={onFileChange} hidden />
-          </Button>
+        <div className="import_aside layout_noscroll wrapperMobile">
+          <AppBar position="static">
+            <form onSubmit={(event) => event.preventDefault()}>
+              <Button className="upload" variant="contained" component="label">
+                Select File
+                <input type="file" onChange={onFileChange} hidden />
+              </Button>
+            </form>
+          </AppBar>
+          <div className="layout_content wrapperMobile">{fileData()}</div>
           <Fab
             variant="extended"
             onClick={(event) => onFileUpload(event.target.value)}
+            disabled={selectedFile ? false : true}
           >
             UPLOAD
             <ImportExportIcon />
           </Fab>
-        </form>
-        <div className="layout_content wrapperMobile">{fileData()}</div>
+        </div>
+        <div className="layout_content wrapperMobile">
+          <p>The table content will go here</p>
+        </div>
       </div>
       <div className="layout_report layout_content wrapperMobile">
         {statistics || isLoading ? (
