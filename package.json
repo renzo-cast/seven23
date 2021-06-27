@@ -82,6 +82,7 @@
     "moment": "^2.27.0",
     "package": "^1.0.1",
     "package.json": "^2.0.1",
+    "papaparse": "^5.3.1",
     "prop-types": "15.7.2",
     "react": "^16.13.1",
     "react-autosuggest": "^10.0.2",

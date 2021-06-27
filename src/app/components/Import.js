@@ -16,10 +16,14 @@ import AppBar from "@material-ui/core/AppBar";
 import Alert from "@material-ui/lab/Alert";
 import ImportExportIcon from "@material-ui/icons/ImportExport";
 
+import CloudDownload from "@material-ui/icons/CloudDownload";
+import Dropzone from "react-dropzone";
 // import TextField from "@material-ui/core/TextField";
 
 // import StatisticsActions from "../actions/StatisticsActions";
-import TransactionTable from "./transactions/TransactionTable";
+// import TransactionTable from "./transactions/TransactionTable";
+import ImportTable from "./import/ImportTable";
+import Papa from "papaparse";
 
 import UserButton from "./settings/UserButton";
 import TransactionForm from "./transactions/TransactionForm";
@@ -37,6 +41,13 @@ export default function Import(props) {
   const [categories] = useSelector((state) => state.categories.list);
 
   const acceptedFileTypes = ["text/csv"];
+  const maxFileSizeInBytes = 1048576; // 1 MB
+
+  const styles = {
+    dropzone: {
+      fontSize: "0.8rem",
+    },
+  };
 
   // Trigger on typing
   // const setSearch = (text) => {
@@ -96,15 +107,7 @@ export default function Import(props) {
     handleEditTransaction(newTransaction);
   };
 
-  // const state = {
-  //   // Initially, no file is selected
-  //   selectedFile: null
-  // };
-
-  // On file select (from the pop up)
-  const onFileChange = (event) => {
-    const file = event.target.files[0];
-
+  const validateFile = (file) => {
     // check if file one of accepted types
     if (!acceptedFileTypes.includes(file.type)) {
       setError({
@@ -115,45 +118,72 @@ export default function Import(props) {
           "' no one of " +
           acceptedFileTypes.toString(),
       });
+      return false;
+    } else {
+      setError({});
+    }
+
+    if (file.size > maxFileSizeInBytes) {
+      setError({
+        type: "FileError",
+        details: "File size '" + file.size + "' bigger than the 1 MB limit",
+      });
+      return false;
+    }
+
+    return true;
+  };
+
+  // On file select (from the pop up)
+  const onFileChange = (files) => {
+    const file = files[0];
+    // console.log(files)
+
+    // extra validation
+    if (!validateFile(file)) {
       return;
     }
+
     // Update the state
-    // this.setState({ selectedFile: event.target.files[0] });
     setSelectedFile(file);
   };
 
   // On file upload (click the upload button)
   const onFileUpload = () => {
     // Create an object of formData
-    const formData = new FormData();
+    // const formData = new FormData();
 
     // Update the formData object
-    formData.append("myFile", selectedFile, selectedFile.name);
+    // formData.append("myFile", selectedFile, selectedFile.name);
 
     // Details of the uploaded file
     console.log(selectedFile);
+    importCSV(selectedFile);
 
     // Request made to the backend api
     // Send formData object
     // axios.post("api/uploadfile", formData);
   };
 
+  const importCSV = (csvfile) => {
+    Papa.parse(csvfile, {
+      complete: updateData,
+      header: true,
+    });
+  };
+
+  const updateData = (result) => {
+    setStatistics({ transactions: result.data });
+  };
+
   // File content to be displayed after
   // file upload is complete
   const fileData = () => {
-    // show error
-    if (Object.keys(error).length !== 0) {
-      return (
-        <div>
-          <Alert severity="error">File error: {error.details}</Alert>
-        </div>
-      );
-    }
     // show file details
     if (selectedFile) {
       return (
         <div>
-          <h2>File Details:</h2>
+          <h4>File Details:</h4>
           <p>File Name: {selectedFile.name}</p>
           <p>File Type: {selectedFile.type}</p>
           <p>Last Modified: {selectedFile.lastModifiedDate.toDateString()}</p>
@@ -162,8 +192,18 @@ export default function Import(props) {
     } else {
       return (
         <div>
+          {Object.keys(error).length !== 0 ? (
+            <Alert severity="error">File error: {error.details}</Alert>
+          ) : (
+            ""
+          )}
           <br />
-          <h4>Choose before Pressing the Upload button</h4>
+          <h4>Please upload your file above</h4>
+          <p>File Requirements:</p>
+          <ul>
+            <li>no larger than 1MB</li>
+            <li>Should be in .csv format</li>
+          </ul>
         </div>
       );
     }
@@ -186,14 +226,25 @@ export default function Import(props) {
       </header>
       <div className="import_two_columns">
         <div className="import_aside layout_noscroll wrapperMobile">
-          <AppBar position="static">
-            <form onSubmit={(event) => event.preventDefault()}>
-              <Button className="upload" variant="contained" component="label">
-                Select File
-                <input type="file" onChange={onFileChange} hidden />
-              </Button>
-            </form>
-          </AppBar>
+          <Dropzone
+            accept={acceptedFileTypes}
+            onDropAccepted={(acceptedFiles) => onFileChange(acceptedFiles)}
+            maxSize={maxFileSizeInBytes}
+            maxFiles={1}
+            multiple={false}
+          >
+            {({ getRootProps, getInputProps }) => (
+              <section style={styles.dropzone} className="dropzone">
+                <div {...getRootProps()}>
+                  <input {...getInputProps()} />
+                  <CloudDownload
+                    style={{ marginRight: 12, position: "relative", top: 6 }}
+                  />{" "}
+                  Click, or drop a <em>.csv</em> file
+                </div>
+              </section>
+            )}
+          </Dropzone>
           <div className="layout_content wrapperMobile">{fileData()}</div>
           <Fab
             variant="extended"
@@ -204,25 +255,30 @@ export default function Import(props) {
             <ImportExportIcon />
           </Fab>
         </div>
-        <div className="layout_content wrapperMobile">
-          <p>The table content will go here</p>
-        </div>
-      </div>
-      <div className="layout_report layout_content wrapperMobile">
-        {statistics || isLoading ? (
-          <div style={{ maxWidth: 750 }}>
-            <TransactionTable
+        <div className="layout_report layout_content wrapperMobile">
+          {statistics || isLoading ? (
+            <div style={{ maxWidth: 750 }}>
+              {/* <TransactionTable
               transactions={statistics ? statistics.transactions : []}
               isLoading={isLoading}
               onEdit={handleEditTransaction}
               onDuplicate={handleDuplicateTransaction}
               pagination="40"
               dateFormat="DD MMM YY"
-            />
-          </div>
-        ) : (
-          ""
-        )}
+            /> */}
+              <ImportTable
+                transactions={statistics ? statistics.transactions : []}
+                isLoading={isLoading}
+                // onEdit={handleEditTransaction}
+                // onDuplicate={handleDuplicateTransaction}
+                // pagination="40"
+                // dateFormat="DD MMM YY"
+              />
+            </div>
+          ) : (
+            ""
+          )}
+        </div>
       </div>
     </div>
   );
