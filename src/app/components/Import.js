@@ -34,7 +34,7 @@ export default function Import(props) {
   // const [text, setText] = useState("");
   const [selectedFile, setSelectedFile] = useState(null);
 
-  const [statistics, setStatistics] = useState(null);
+  const [transactions, setTransactions] = useState(null);
   const [error, setError] = useState({});
   const [isLoading, setIsLoading] = useState(false);
 
@@ -53,7 +53,7 @@ export default function Import(props) {
   // const setSearch = (text) => {
   //   setText(text);
   //   if (!text) {
-  //     setStatistics(null);
+  //     setTransactions(null);
   //     setIsLoading(false);
   //   } else {
   //     setIsLoading(true);
@@ -62,7 +62,7 @@ export default function Import(props) {
   //       dispatch(StatisticsActions.search(text))
   //         .then((result) => {
   //           setIsLoading(false);
-  //           setStatistics(result);
+  //           setTransactions(result);
   //         })
   //         .catch((error) => {
   //           if (error) {
@@ -80,7 +80,7 @@ export default function Import(props) {
   //   if (reduxTransaction) {
   //     setSearch(text);
   //   } else {
-  //     setStatistics(null);
+  //     setTransactions(null);
   //   }
   // }, [reduxTransaction]);
 
@@ -173,7 +173,22 @@ export default function Import(props) {
   };
 
   const updateData = (result) => {
-    setStatistics({ transactions: result.data });
+    setTransactions(result.data);
+  };
+
+  const changeTransactionValue = (value, id, key) => {
+    setTransactions(
+      transactions.map((t, i) => {
+        if (i === id) {
+          console.log("index:" + i + "; id: " + id);
+          t[key] = value;
+          console.log(key);
+          console.log(value);
+          console.log(t);
+        }
+        return t;
+      })
+    );
   };
 
   // File content to be displayed after
@@ -256,10 +271,10 @@ export default function Import(props) {
           </Fab>
         </div>
         <div className="layout_report layout_content wrapperMobile">
-          {statistics || isLoading ? (
+          {transactions || isLoading ? (
             <div style={{ maxWidth: 750 }}>
               {/* <TransactionTable
-              transactions={statistics ? statistics.transactions : []}
+              transactions={transactions ? transactions.transactions : []}
               isLoading={isLoading}
               onEdit={handleEditTransaction}
               onDuplicate={handleDuplicateTransaction}
@@ -267,8 +282,9 @@ export default function Import(props) {
               dateFormat="DD MMM YY"
             /> */}
               <ImportTable
-                transactions={statistics ? statistics.transactions : []}
+                transactions={transactions || []}
                 isLoading={isLoading}
+                changeTransactionValue={changeTransactionValue}
                 // onEdit={handleEditTransaction}
                 // onDuplicate={handleDuplicateTransaction}
                 // pagination="40"

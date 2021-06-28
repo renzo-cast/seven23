@@ -11,6 +11,8 @@ import TableContainer from "@material-ui/core/TableContainer";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
+import Input from "@material-ui/core/Input";
+
 import { checkPropTypes } from "prop-types";
 
 const useStyles = makeStyles({
@@ -20,7 +22,13 @@ const useStyles = makeStyles({
 });
 
 function createData(name, calories, fat, carbs, protein) {
-  return { name, calories, fat, carbs, protein };
+  return {
+    name: name,
+    calories: calories,
+    fat: fat,
+    carbs: carbs,
+    protein: protein,
+  };
 }
 
 const rows = [
@@ -44,33 +52,62 @@ export default function ImportTable(props) {
       : null
   );
 
-  const transactions = props.transactions || [];
-  transactions.forEach((transaction, index) => {
-    // console.log(transaction)
-    // if (transaction.category) {
-    //   const c = categories.find((c) => c.id == transaction.category);
-    //   transaction.category_name = c ? c.name.toLowerCase() : "";
-    // } else {
-    //   transaction.category_name = "";
-    // }
-  });
+  // let transactions = []
+  // rows.forEach((row) => {
+  //   transactions.push(createData(row.name, row.calories, row.fat, row.carbs, row.protein))
+  // })
+
+  // let transactions = props.transactions || [];
+  // transactions.forEach((transaction, index) => {
+  //   // console.log(transaction)
+  //   // if (transaction.category) {
+  //   //   const c = categories.find((c) => c.id == transaction.category);
+  //   //   transaction.category_name = c ? c.name.toLowerCase() : "";
+  //   // } else {
+  //   //   transaction.category_name = "";
+  //   // }
+  // });
+
+  const changeValue = () => {
+    // console.log("value changing")
+  };
+  const handleInput = (event) => {
+    // console.log(event.target.value )
+  };
+  const updateValue = (event, index, key) => {
+    console.log(event.target.value);
+
+    transactions[index][key] = event.target.value;
+  };
+
+  // console.log(statistics)
 
   return (
     <TableContainer component={Paper}>
       <Table className={classes.table} aria-label="simple table">
         <TableHead>
           <TableRow>
-            {Object.keys(transactions[0]).map((key, index) => (
+            {Object.keys(props.transactions[0]).map((key, index) => (
               <TableCell key={index}>{key}</TableCell>
             ))}
           </TableRow>
         </TableHead>
         <TableBody>
-          {transactions.map((row) => (
-            <TableRow key={row["key"]}>
+          {props.transactions.map((row, transactionIndex) => (
+            <TableRow key={transactionIndex}>
               {Object.keys(row).map((key, index) => (
-                <TableCell key={index} component="th" scope="row">
-                  {row[key]}
+                <TableCell key={index} component="td" scope="row">
+                  <Input
+                    defaultValue={row[key]}
+                    onChange={(event) => changeValue}
+                    onBlur={(event) =>
+                      props.changeTransactionValue(
+                        event.target.value,
+                        transactionIndex,
+                        key
+                      )
+                    }
+                  />
                 </TableCell>
               ))}
             </TableRow>
