@@ -39,6 +39,10 @@
       left: 0;
       right: 0;
       transform: translateY(20px);
+
+      &.leftCard {
+        left: 0;
+      }
     }
 
     @media screen and (min-width: $modalFullScreen) {
@@ -48,6 +52,10 @@
       right: 0;
       width: 400px;
       transform: translateX(20px);
+
+      &.leftCard {
+        left: 0;
+      }
     }
 
     form.content {
