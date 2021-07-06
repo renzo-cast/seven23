@@ -26,47 +26,13 @@ import ImportMenu from "./import/ImportMenu";
 export default function Import(props) {
   const dispatch = useDispatch();
 
-  const [transactions, setTransactions] = useState(null);
+  const [importedTransactions, setImportedTransactions] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
-  // Trigger on typing
-  // const setSearch = (text) => {
-  //   setText(text);
-  //   if (!text) {
-  //     setTransactions(null);
-  //     setIsLoading(false);
-  //   } else {
-  //     setIsLoading(true);
-  //     if (timer) clearTimeout(timer);
-  //     timer = setTimeout(() => {
-  //       dispatch(StatisticsActions.search(text))
-  //         .then((result) => {
-  //           setIsLoading(false);
-  //           setTransactions(result);
-  //         })
-  //         .catch((error) => {
-  //           if (error) {
-  //             console.error(error);
-  //           }
-  //         });
-  //     }, DELAY_TYPE_TO_SEARCH);
-  //   }
-  // };
-
-  // Perform search if transaction list change (to refresh on delete event for exemple)
-  // const reduxTransaction = useSelector((state) => state.transactions);
-
-  // useEffect(() => {
-  //   if (reduxTransaction) {
-  //     setSearch(text);
-  //   } else {
-  //     setTransactions(null);
-  //   }
-  // }, [reduxTransaction]);
-
   const [categories] = useSelector((state) => state.categories.list);
 
+  console.log("import.js");
   //
   // Menu
   //
@@ -80,7 +46,7 @@ export default function Import(props) {
       return transaction;
     });
     // console.log(transactionData)
-    setTransactions(transactionData);
+    setImportedTransactions(transactionData);
     // close the menu
     setIsMenuOpen(false);
   };
@@ -102,8 +68,8 @@ export default function Import(props) {
   // }, [isMenuOpen]);
 
   const changeTransactionValue = (value, id, key) => {
-    setTransactions(
-      transactions.map((t, i) => {
+    setImportedTransactions(
+      importedTransactions.map((t, i) => {
         if (i === id) {
           console.log("index:" + i + "; id: " + id);
           t[key] = value;
@@ -115,6 +81,47 @@ export default function Import(props) {
       })
     );
   };
+
+  const buildColumns = (rows) =>
+    rows.length < 1
+      ? []
+      : Object.keys(rows[0]).map((key, i) => {
+          let value = rows[0][key];
+
+          // if the value is empty in the test row check all other rows for a value to test
+          if (value === "" || typeof value === undefined) {
+            let found = rows.find((transaction) => transaction[key] !== "");
+            value = found ? found[key] : "";
+          }
+
+          // default type
+          let type = "string";
+          // determine if it should stay a string or something else
+          if (key === "Category") {
+            type = "singleSelect";
+          } else if (!value || typeof value == undefined) {
+            type = "string";
+          } else if (isNumber(value) || key == "id") {
+            type = "number";
+          } else if (moment(value).isValid()) {
+            type = "date";
+          }
+
+          return {
+            flex: 1,
+            field: key,
+            headerName: key,
+            sortable: true,
+            editable: true,
+            type: type,
+            hide: key == "id" ? true : false,
+            valueFormatter: ({ value }) =>
+              type === "number"
+                ? currencyFormatter.format(Number(value))
+                : value,
+            valueOptions: categories,
+          };
+        });
 
   return (
     <div className="layout">
@@ -137,10 +144,10 @@ export default function Import(props) {
         </Card>
       </div>
       <div className="layout_content layout_noscroll wrapperMobile">
-        {transactions || isLoading ? (
+        {importedTransactions || isLoading ? (
           <div className={"layout_content transactionData"}>
             <ImportTable
-              transactions={transactions || []}
+              transactions={importedTransactions || []}
               isLoading={isLoading}
               changeTransactionValue={changeTransactionValue}
               // onEdit={handleEditTransaction}
@@ -157,7 +164,7 @@ export default function Import(props) {
           style={{ zIndex: 1000 }}
           className={"show layout_fab_button"}
           aria-label="Import"
-          disabled={!transactions}
+          disabled={!importedTransactions}
           onClick={handleMenuOpen}
         >
           {isMenuOpen ? <ContentRemove /> : <ContentAdd />}

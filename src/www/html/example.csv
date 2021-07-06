@@ -1,0 +1,10 @@
+BSB Number,Account Number,Transaction Date,Narration,Cheque,Debit,Credit,Balance,Transaction Type
+,test account,28/6/21,AUTHORISATION ONLY - Soul Tree Café,,4.5,,-13.67
+,test account,28/6/21,AUTHORISATION ONLY - Soul Tree Café,,9,,-9.17
+,test account,28/6/21,AUTHORISATION ONLY - McDonalds,,4,,-0.17
+,test account,28/6/21,AUTHORISATION ONLY - CHEMIST ,,2.09,,3.83
+,test account,28/6/21,CC repayment,,,664,12.83
+,test account,25/6/21,Thai,,43.8,,-1011.17,WDL
+,test account,25/6/21,Take Away,,39.5,,-967.37,WDL
+,test account,25/6/21,Aldi,,16.6,,-927.87,WDL
+,test account,25/6/21,Love it Café,,12.63,,-911.27,WDL

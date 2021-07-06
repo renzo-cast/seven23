@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-// import moment from "moment";
 
 import { makeStyles } from "@material-ui/styles";
 
@@ -72,23 +71,14 @@ export default function ImportMenu(props) {
 
   // On file upload (click the upload button)
   const onFileUpload = () => {
-    // Create an object of formData
-    // const formData = new FormData();
-
-    // Update the formData object
-    // formData.append("myFile", selectedFile, selectedFile.name);
-
     // Details of the uploaded file
-    console.log(selectedFile);
-    importCSV(selectedFile);
-
-    // Request made to the backend api
-    // Send formData object
-    // axios.post("api/uploadfile", formData);
+    importCSV("../../../example.csv"); // FOR TESTING
+    // importCSV(selectedFile);
   };
 
   const importCSV = (csvfile) => {
     Papa.parse(csvfile, {
+      download: true, // FOR TESTING
       complete: props.updateData,
       header: true,
     });
@@ -155,7 +145,7 @@ export default function ImportMenu(props) {
       <Fab
         variant="extended"
         onClick={(event) => onFileUpload(event.target.value)}
-        disabled={selectedFile ? false : true}
+        // disabled={selectedFile ? false : true}
       >
         UPLOAD
         <ImportExportIcon />
